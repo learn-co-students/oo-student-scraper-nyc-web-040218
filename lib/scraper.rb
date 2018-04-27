@@ -23,24 +23,27 @@ class Scraper
   def self.scrape_profile_page(profile_url)
     html = File.read(profile_url)
     profiles_html = Nokogiri::HTML(html)
-    binding.pry
     profile = {
-      :name => profiles_html.css("h1").text,
-      :location => profiles_html.css(".profile-location").text,
+      # :name => profiles_html.css("h1").text,
+      # :location => profiles_html.css(".profile-location").text,
       :profile_quote => profiles_html.css(".profile-quote").text,
-      :bio => profiles_html.css(".description-holder p").text,
-
-      profiles_html.css(".social-icon-container a").each do |ur|
-        if ur.attribute("href").value.include?("twitter")
-          :twitter => ur.attribute("href").value,
-        elsif ur.attribute("href").value.include?("linkedin")
-          :linkedin => profiles_html.css(".social-icon-container a").attribute("href").value,
-        elsif ur.attribute("href").value.include?("git")
-          :github => profiles_html.css(".social-icon-container a").attribute("href").value,
-        end
-      end
+      :bio => profiles_html.css(".description-holder p").text
     }
 
+    # GET PROFILE LINKS
+    profiles_html.css(".social-icon-container a").each do |ur|
+      if ur.attribute("href").value.include?("twitter")
+        profile[:twitter] = ur.attribute("href").value
+      elsif ur.attribute("href").value.include?("linkedin")
+        profile[:linkedin] = ur.attribute("href").value
+      elsif ur.attribute("href").value.include?("git")
+        profile[:github] = ur.attribute("href").value
+      # elsif ur.attribute("href").value.include?("#{profiles_html.css('h1').text.gsub(/\s+/, "")+'.com'}")
+      else
+        profile[:blog] = ur.attribute("href").value
+      end
+    end
+    # binding.pry
     profile
   end
 
